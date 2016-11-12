@@ -2,24 +2,29 @@
 #include<stdlib.h>
 #include<time.h>
 
-int i,j,k,m,tmp=1;
+int i, j, k, m, tmp;
 
-int main(void) {
-	void pspace(int);
+void pspace(int n);
+void ptable(int coord[8][8]);
+int testo(int coord[8][8], int x, int y);
+
+void comp(int coord[8][8]);
+int testcom(int coord[8][8], int x, int y);
+int testx(int coord[8][8], int x, int y);
+
+int main(void)
+{
+	tmp = 1;
+
 	char movei;
-	int flag = 0, movej = 2;
-	void ptable(int coord[8][8]);
-	int coord[8][8] = { 0 },c;
-	int test(int coord, int x, int y);
+	int coord[8][8] = { 0 }, c, movej, flag = 0;
 
 	coord[3][3] = coord[4][4] = 1;
 	coord[4][3] = coord[3][4] = 2;
 	ptable(coord);
 
-
-
-	while(1)
-	{   
+	while (1)
+	{
 		printf("you are O.\n");
 		do {
 			if (tmp == 0)
@@ -31,8 +36,9 @@ int main(void) {
 					if (c == ' ' || c == '\n' || c == EOF) break;
 				}
 			}
-			while (flag == 0||tmp ==0)
-			{   
+
+			while (flag == 0 || tmp == 0)
+			{
 				printf("enter your move:");
 				if (scanf(" %c%d", &movei, &movej) == 2)
 					if (movei >= 'a' && movei <= 'h')
@@ -48,15 +54,20 @@ int main(void) {
 						if (c == ' ' || c == '\n' || c == EOF) break;
 					}
 				}
-				
+
 				tmp = 1;
 			}
-		} while(test(coord, movei - 97, movej - 1) == 0);
+
+		} while (testo(coord, movei - 97, movej - 1) == 0);
 
 		coord[movei - 97][movej - 1] = 2;
 
 		ptable(coord);
 		flag = 0;
+
+
+		comp(coord);
+		ptable(coord);
 	}
 
 }
@@ -69,7 +80,7 @@ void pspace(int n)
 }
 
 void ptable(int coord[8][8])
-{   
+{
 	pspace(49); printf("|a|b|c|d|e|f|g|h|\n");
 	pspace(49); printf("+-+-+-+-+-+-+-+-+\n");
 
@@ -91,22 +102,128 @@ void ptable(int coord[8][8])
 
 
 
-int test(int coord[8][8], int x, int y)
+int testo(int coord[8][8], int x, int y)
 {
 	int Ocount = 0, Xcount = 0, i = 1;
-	
+
+
 	tmp = 0;
 
-	for(k=-1;k<=1;k++)
+	if (coord[x][y] != 1 && coord[x][y] != 2)
+	{
+		for (k = -1; k <= 1; k++)
+			for (m = -1; m <= 1; m++)
+			{
+				while (1)
+				{
+					if (coord[x + i*k][y + i*m] == 1)
+						Xcount++;
+					else if (coord[x + i*k][y + i*m] == 2)
+					{
+						Ocount++;
+						break;
+					}
+					else
+						break;
+					i++;
+				}
+				if (Ocount == 1)
+					for (i = 1; i <= Xcount; i++)
+					{
+						coord[x + i*k][y + i*m] = 2;
+						tmp++;
+					}
+				Ocount = Xcount = 0;
+				i = 1;
+			}
+		return tmp;
+	}
+	else
+		return 0;
+	
+}
+
+
+void comp(int coord[8][8])
+{
+
+	int a[128] = { 0 }, n = 0, x,q;
+
+	srand(time(0));
+
+	for(i=0;i<8;i++)
+		for(j=0;j<8;j++)
+			if (testcom(coord, i, j) == 1)
+			{
+				a[n] = i;
+				a[n + 64] = j;
+				n++;
+			}
+
+	if (n != 0)
+	{
+		x = rand() % (n);
+		testx(coord, a[x], a[x + 64]);
+		coord[a[x]][a[x + 64]] = 1;
+	}  	
+	printf("your opponent enter %c%d\n",a[x]+97,a[x+64]+1);
+}
+
+int testcom(int coord[8][8], int x, int y)
+{
+	int Ocount = 0, Xcount = 0, i = 1, comflag = 0;
+
+
+	tmp = 0;
+
+	if (coord[x][y] != 1 && coord[x][y] != 2)
+	{
+		for (k = -1; k <= 1; k++)
+			for (m = -1; m <= 1; m++)
+			{
+				while (1)
+				{
+					if (coord[x + i*k][y + i*m] == 2)
+						Ocount++;
+					else if (coord[x + i*k][y + i*m] == 1)
+					{
+						Xcount++;
+						break;
+					}
+					else
+						break;
+					i++;
+				}
+				if (Xcount == 1)
+					if (Ocount > 0)
+						comflag = 1;
+
+				Ocount = Xcount = 0;
+				i = 1;
+			}
+		return comflag;
+	}
+	else
+		return 0;
+}
+
+int testx(int coord[8][8], int x, int y)
+{
+	int Ocount = 0, Xcount = 0, i = 1;
+
+
+	tmp = 0;
+
+	for (k = -1; k <= 1; k++)
 		for (m = -1; m <= 1; m++)
 		{
 			while (1)
 			{
-				if (coord[x + i*k][y + i*m] == 1)
-					Xcount++;
-				else if (coord[x + i*k][y + i*m] == 2)
-				{
+				if (coord[x + i*k][y + i*m] == 2)
 					Ocount++;
+				else if (coord[x + i*k][y + i*m] == 1)
+				{
+					Xcount++;
 					break;
 				}
 				else
@@ -114,14 +231,13 @@ int test(int coord[8][8], int x, int y)
 				i++;
 			}
 			if (Xcount == 1)
-				for (i = 1; i <= Ocount; i++)
-				{
-					coord[x + i*k][y + i*m] = 2;
-					tmp++;
+				for (i = 1; i <= Ocount;i++)
+				{		
+					coord[x + i*k][y + i*m] = 1;
+				    tmp++;
 				}
 			Ocount = Xcount = 0;
 			i = 1;
 		}
 	return tmp;
 }
-
