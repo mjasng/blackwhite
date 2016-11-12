@@ -1,0 +1,174 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+
+int i,j,k,m,tmp=1;
+
+int main(void) {
+	void pspace(int);
+	char movei;
+	int flag = 0, movej = 2;
+	void ptable(int coord[8][8]);
+	int coord[8][8] = { 0 },c;
+	int test(int coord, int x, int y);
+
+	coord[3][3] = coord[4][4] = 1;
+	coord[4][3] = coord[3][4] = 2;
+	ptable(coord);
+
+
+
+	while(1)
+	{   
+		printf("you are O.\n");
+		do {
+			if (tmp == 0)
+			{
+				printf("fk rule!\n");
+				while (1)
+				{
+					c = getchar();
+					if (c == ' ' || c == '\n' || c == EOF) break;
+				}
+			}
+			while (flag == 0||tmp ==0)
+			{   
+				printf("enter your move:");
+				if (scanf(" %c%d", &movei, &movej) == 2)
+					if (movei >= 'a' && movei <= 'h')
+						if (movej >= 1 && movej <= 8)
+							flag = 1;
+				if (flag == 0)
+				{
+					printf("wrong input!\n");
+					movei = movej = 0;
+					while (1)
+					{
+						c = getchar();
+						if (c == ' ' || c == '\n' || c == EOF) break;
+					}
+				}
+				
+				tmp = 1;
+			}
+		} while(test(coord, movei - 97, movej - 1) == 0);
+
+		coord[movei - 97][movej - 1] = 2;
+
+		ptable(coord);
+		flag = 0;
+	}
+
+}
+
+
+void pspace(int n)
+{
+	for (i = 0; i < n; i++)
+		printf(" ");
+}
+
+void ptable(int coord[8][8])
+{   
+	pspace(49); printf("|a|b|c|d|e|f|g|h|\n");
+	pspace(49); printf("+-+-+-+-+-+-+-+-+\n");
+
+	for (j = 0; j < 8; j++)
+	{
+		pspace(48);
+		printf("%d", j + 1);
+		for (i = 0; i < 8; i++)
+			if (coord[i][j] == 1)
+				printf("|X");
+			else if (coord[i][j] == 2)
+				printf("|O");
+			else
+				printf("| ");
+		printf("|\n");
+	}
+	pspace(49); printf("+---------------+\n");
+}
+
+
+
+int test(int coord[8][8], int x, int y)
+{
+	int Ocount = 0, Xcount = 0, i = 1;
+	
+	tmp = 0;
+
+	for(k=-1;k<=1;k++)
+		for (m = -1; m <= 1; m++)
+		{
+			while (1)
+			{
+				if (coord[x + i*k][y + i*m] == 1)
+					Xcount++;
+				else if (coord[x + i*k][y + i*m] == 2)
+				{
+					Ocount++;
+					break;
+				}
+				else
+					break;
+				i++;
+			}
+			if (Xcount == 1)
+				for (i = 1; i <= Ocount; i++)
+				{
+					coord[x + i*k][y + i*m] = 2;
+					tmp++;
+				}
+			Ocount = Xcount = 0;
+			i = 1;
+		}
+	return tmp;
+}
+
+void comp(int coord[8][8])
+{
+	int a[64] = {0};
+
+	srand(time(0));
+	
+	while(testcom(coord, i, j) == 1)
+	{
+	a[i] = testcom(coord, i, j);
+	i++;
+	j++;
+	}
+
+	rand() % (n)+1;
+
+} 
+
+int testcom(int coord[8][8], int x, int y)
+{
+	int Ocount = 0, Xcount = 0, i = 1,comflag=0;
+
+	tmp = 0;
+
+	for (k = -1; k <= 1; k++)
+		for (m = -1; m <= 1; m++)
+		{
+			while (1)
+			{
+				if (coord[x + i*k][y + i*m] == 1)
+					Xcount++;
+				else if (coord[x + i*k][y + i*m] == 2)
+				{
+					Ocount++;
+					break;
+				}
+				else
+					break;
+				i++;
+			}
+			if (Xcount == 1)
+				comflag = 1;
+
+			Ocount = Xcount = 0;
+			i = 1;
+		}
+	return comflag;
+}
